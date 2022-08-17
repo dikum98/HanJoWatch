@@ -1,58 +1,63 @@
-// start 클릭 : setInterval 100ms 간격으로 시작
-// stop 클릭 : clearInterval
-
 const select = (selector) => document.querySelector(selector);
-const INITIALTIME = '00:00:00.0';
 const timeElement = select('time');
-const startButton = select('.button-start');
-const stopButton = select('.button-stop');
-const resumeButton = select('.button-resume');
-const resetButton = select('.button-reset');
+const controls = select('.controls');
 
 function HanjoWatch() {
   this.timerId = null;
   this.timeCount = 0;
-
-  const setDigit = (item) => {
-    return (item + '').padStart(2, '0');
-  };
-
-  const parseTime = (timeCount) => {
-    let milliSeconds = timeCount % 10;
-    let seconds = parseInt(timeCount / 10);
-    seconds = setDigit(seconds > 59 ? seconds % 60 : seconds);
-    let minutes = timeCount > 599 ? parseInt(timeCount / 600) : 0;
-    minutes = setDigit(minutes);
+  this.constructor.INITIALTIME = '00:00:00.0';
+  this.constructor.setDigit = (item) => (item + '').padStart(2, '0');
+  this.constructor.parseTime = (timeCount) => {
+    let milliSeconds = this.timeCount % 10;
+    let seconds = parseInt(this.timeCount / 10);
+    seconds = this.constructor.setDigit(seconds > 59 ? seconds % 60 : seconds);
+    let minutes = this.timeCount > 599 ? parseInt(this.timeCount / 600) : 0;
+    minutes = this.constructor.setDigit(minutes);
     return `00:${minutes}:${seconds}:${milliSeconds}`;
   };
-
-  this.intervalHandler = (timeElement) => () => {
-    this.timeCount += 1;
-    timeElement.innerHTML = parseTime(this.timeCount);
-  };
-
-  this.runTimer = () => {
-    this.timerId = setInterval(this.intervalHandler(timeElement), 100);
-  };
-
-  this.pauseTimer = () => {
-    clearInterval(this.timerId);
-  };
-
-  this.resumeTimer = () => {
-    this.timerId = setInterval(this.intervalHandler(timeElement, this.timeCount), 100);
-  };
-
-  this.resetTimer = () => {
-    clearInterval(this.timerId);
-    this.timeCount = 0;
-    timeElement.innerHTML = INITIALTIME;
-  };
 }
+HanjoWatch.prototype.intervalHandler = function (timeElement) {
+  this.timeCount += 1;
+  timeElement.innerHTML = this.constructor.parseTime(this.timeCount);
+};
+HanjoWatch.prototype.runTimer = function (timeElement) {
+  this.timerId = setInterval(() => this.intervalHandler(timeElement), 100);
+};
+HanjoWatch.prototype.pauseTimer = function () {
+  clearInterval(this.timerId);
+};
+HanjoWatch.prototype.resumeTimer = function (timeElement) {
+  this.timerId = setInterval(() => this.intervalHandler(timeElement), 100);
+};
+HanjoWatch.prototype.resetTimer = function (timeElement) {
+  clearInterval(this.timerId);
+  this.timeCount = 0;
+  timeElement.innerHTML = this.constructor.INITIALTIME;
+};
 
-const hanjoWatch = new HanjoWatch();
+const newHanjo = new HanjoWatch();
 
-startButton.addEventListener('click', hanjoWatch.runTimer);
-stopButton.addEventListener('click', hanjoWatch.pauseTimer);
-resumeButton.addEventListener('click', hanjoWatch.resumeTimer);
-resetButton.addEventListener('click', hanjoWatch.resetTimer);
+controls.addEventListener('click', ({ target }) => {
+  if (target.tagName !== 'BUTTON') {
+    return;
+  }
+  switch (target.innerText) {
+    case 'START':
+      newHanjo.runTimer(timeElement);
+      break;
+    case 'STOP':
+      newHanjo.pauseTimer(timeElement);
+      break;
+    case 'RESUME':
+      newHanjo.resumeTimer(timeElement);
+      break;
+    case 'LAP':
+      newHanjo.runTimer(timeElement);
+      break;
+    case 'RESET':
+      newHanjo.resetTimer(timeElement);
+      break;
+    default:
+      break;
+  }
+});
