@@ -1,0 +1,40 @@
+.controls {
+	margin-left: auto;
+	margin-right: auto;
+}
+.controls ul {
+	position: relative;
+	list-style: none;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+}
+
+.controls ul li {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: block;
+}
+
+.controls div {
+	margin-top: 60px;
+	width: 200px;
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+button[class*='button'] {
+	width: 200px;
+	height: 50px;
+	background-color: #efefef;
+	border: 2px solid #595959;
+	border-radius: 45%;
+	animation: wave 1s infinite linear;
+}
+
+@keyframes wave {
+	100% {
+		transform: rotate(360deg);
+	}
+}
